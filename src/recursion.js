@@ -61,28 +61,25 @@ var isEven = function(n) {
 // sumBelow(10); // 45
 // sumBelow(7); // 21
 var sumBelow = function(n) {
-  // Base case: if n is less than or equal to 0, return 0
-  if (n <= 0) {
+  if(n === 0){
     return 0;
   }
-
-  // Sum all integers below n by making a recursive call with (n - 1) and adding n - 1
-  return (n - 1) + sumBelow(n - 1);
+  return n - 1 + sumBelow(n - 1);
 };
+
+
+
 
 // 6. Get the integers in range (x, y).
 // Example:  range(2, 9);  // [3, 4, 5, 6, 7, 8]
 var range = function(x, y, result = []) {
-  // Base case: if x is greater than or equal to y, return the result array
-  if (x >= y - 1) {
+   // Base case: stop recursion when x is greater than or equal to y
+   if (x >= y - 1) {
     return result;
   }
 
-  // Add the next integer in the range to the result array
-  result.push(x + 1);
-
-  // Recursively call the function with the next integer and the updated result array
-  return range(x + 1, y, result);
+  // Recursively call range with the next integer and concatenate it to the result
+  return range(x + 1, y, result.concat(x + 1));
 };
 
 // 7. Compute the exponent of a number.
@@ -91,18 +88,18 @@ var range = function(x, y, result = []) {
 // Example:  exponent(4,3);  // 64
 // https://www.khanacademy.org/computing/computer-science/algorithms/recursive-algorithms/a/computing-powers-of-a-number
 var exponent = function(base, exp) {
-  // Base case: when the exponent is 0, any number raised to the power of 0 is 1
-  if (exp === 0) {
-    return 1;
+    // Base case: if the exponent is 0, return 1
+    if (exp === 0) {
+      return 1;
   }
 
-  // Recursive case: multiply the base by the result of exponent for a reduced exp
-  if (exp > 0) {
-    return base * exponent(base, exp - 1);
-  } else {
-    // If the exponent is negative, calculate the reciprocal of the positive exponent result
-    return 1 / (base * exponent(base, exp + 1));
+  // If the exponent is negative, compute the reciprocal with a positive exponent
+  if (exp < 0) {
+      return 1 / (base * exponent(base, -exp - 1));
   }
+
+  // Recursive call to compute the exponent
+  return base * exponent(base, exp - 1);
 };
 
 // 8. Determine if a number is a power of two.
@@ -367,15 +364,46 @@ var flatten = function(arrays) {
 
 // 30. Given a string, return an object containing tallies of each letter.
 // letterTally('potato'); // {'p':1, 'o':2, 't':2, 'a':1}
-var letterTally = function(str, obj) {
-};
+var letterTally = function(str, index = 0, tally = {}) {
+    // Base case: if the index reaches the end of the string
+    if (index === str.length) {
+      return tally;
+  }
+
+  var currentChar = str[index];
+
+  // Check if the character is already a key in the tally object
+  if (tally[currentChar]) {
+      // If yes, increment the count
+      tally[currentChar]++;
+  } else {
+      // If no, add a new key with a count of 1
+      tally[currentChar] = 1;
+  }
+
+  // Recursive call with the next index
+  return letterTally(str, index + 1, tally);
+}
+
 
 // 31. Eliminate consecutive duplicates in a list.  If the list contains repeated
 // elements they should be replaced with a single copy of the element. The order of the
 // elements should not be changed.
 // Example: compress([1, 2, 2, 3, 4, 4, 5, 5, 5]) // [1, 2, 3, 4, 5]
 // Example: compress([1, 2, 2, 3, 4, 4, 2, 5, 5, 5, 4, 4]) // [1, 2, 3, 4, 2, 5, 4]
-var compress = function(list) {
+var compress = function(list, index = 0, compressedList =[]) {
+  // Base case: if the index reaches the end of the list
+  if (index === list.length) {
+    return compressedList;
+}
+
+// Check if the current element is not the same as the next element
+if (list[index] !== list[index + 1]) {
+    compressedList.push(list[index]);
+}
+
+// Recursive call with the next index
+return compress(list, index + 1, compressedList);
 };
 
 // 32. Augment every element in a list with a new value where each element is an array
@@ -387,20 +415,91 @@ var augmentElements = function(array, aug) {
 // 33. Reduce a series of zeroes to a single 0.
 // minimizeZeroes([2,0,0,0,1,4]) // [2,0,1,4]
 // minimizeZeroes([2,0,0,0,1,0,0,4]) // [2,0,1,0,4]
-var minimizeZeroes = function(array) {
+var minimizeZeroes = function(array, index = 0, result = []) {
+  // Base case: if the index reaches the end of the array
+  if (index === array.length) {
+    return result;
+}
+
+// Check if the current element is not zero or the previous element is not zero
+if (array[index] !== 0 || (index > 0 && array[index - 1] !== 0)) {
+    result.push(array[index]);
+}
+
+// Recursive call with the next index
+return minimizeZeroes(array, index + 1, result);
 };
 
 // 34. Alternate the numbers in an array between positive and negative regardless of
 // their original sign.  The first number in the index always needs to be positive.
 // alternateSign([2,7,8,3,1,4]) // [2,-7,8,-3,1,-4]
 // alternateSign([-2,-7,8,3,-1,4]) // [2,-7,8,-3,1,-4]
-var alternateSign = function(array) {
-};
+var alternateSign = function(array, index = 0, result = []) {
+   if (index === array.length) {
+    return result;
+}
+
+if (index === 0) {
+    // Make the first number positive
+    result.push(Math.abs(array[index]));
+} else {
+    // Alternate the sign based on the index
+    if (index % 2 === 1) {
+        result.push(-Math.abs(array[index]));
+    } else {
+        result.push(Math.abs(array[index]));
+    }
+}
+
+// Recursive call with the next index
+return alternateSign(array, index + 1, result);
+}
 
 // 35. Given a string, return a string with digits converted to their word equivalent.
 // Assume all numbers are single digits (less than 10).
 // numToText("I have 5 dogs and 6 ponies"); // "I have five dogs and six ponies"
-var numToText = function(str) {
+var numToText = function(str, index = 0) {
+    // Define a function to convert single digits to their word equivalents
+    function digitToWord(digit) {
+      switch (digit) {
+          case '0':
+              return 'zero';
+          case '1':
+              return 'one';
+          case '2':
+              return 'two';
+          case '3':
+              return 'three';
+          case '4':
+              return 'four';
+          case '5':
+              return 'five';
+          case '6':
+              return 'six';
+          case '7':
+              return 'seven';
+          case '8':
+              return 'eight';
+          case '9':
+              return 'nine';
+          default:
+              return digit;
+      }
+  }
+
+  // Base case: if the index reaches the end of the string
+  if (index === str.length) {
+      return str;
+  }
+
+  // Check if the character at the current index is a digit
+  if (/[0-9]/.test(str[index])) {
+      // Replace the digit with its word equivalent
+      str = str.substring(0, index) + digitToWord(str[index]) + str.substring(index + 1);
+  }
+
+  // Recursive call with the next index
+  return numToText(str, index + 1);
 };
 
 // *** EXTRA CREDIT ***
